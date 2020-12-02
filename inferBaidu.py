@@ -47,7 +47,7 @@ add_arg('target_dir',   str,
         '/content/DeepSpeech2/DeepSpeech/dataset/librispeech/test-clean/LibriSpeech/test-clean/',
         "Filepath of voice sample testing folder.")
 add_arg('infer_manifest',   str,
-        'data/librispeech/manifest.test-clean',
+        'data/manifest.test-clean',
         "Filepath of manifest to infer.")
 add_arg('mean_std_path',    str,
         'models/baidu_en8k/mean_std.npz',
@@ -156,7 +156,7 @@ def infer(ds2_model, data_generator, vocab_list):
     error_rate_func = cer if args.error_rate_type == 'cer' else wer
     errors_sum, len_refs, num_ins = 0.0, 0, 0
     error_arr = []
-    ds2_model.logger.info("OKOK .. Starting inference ...")
+    ds2_model.logger.info("\nEverything Prepared .. Starting inference ...\n")
     for infer_data in batch_reader():
         probs_split= ds2_model.infer_batch_probs(
             infer_data=infer_data,
@@ -171,26 +171,30 @@ def infer(ds2_model, data_generator, vocab_list):
             vocab_list=vocab_list,
             num_processes=args.num_proc_bsearch)
         target_transcripts = infer_data[1]
+        audio_file_paths = infer_data[4]
         json_lines = []
-        print("Creating transcription.json ...")
-        for target, result in zip(target_transcripts, result_transcripts):
+        print("Writing Results on TRANSCRIPTION.json ...")
+        for target, result, audio_file_path  in zip(target_transcripts, result_transcripts,audio_file_paths):
             target = target.replace("’", "'")
             erroris = error_rate_func(target, result)
             json_lines.append(
                         json.dumps({
+                            'Audio file path': audio_file_path,
                             'Target Transcription': target,
                             'Output Transcription': result,
-                            'Current {} error rate'.format(args.error_rate_type): erroris ,
+                            'The {} '.format(args.error_rate_type): erroris,
                         }, indent=4, ensure_ascii=False, sort_keys=True))
             error_arr.append(erroris)
         wer_arr = np.array(error_arr)
         print("Current Error Rate is : ",str(np.average(wer_arr)))
-        with codecs.open('transcription.json', 'a+', 'utf-8') as out_file:
+        with codecs.open('TRANSCRIPTION.json', 'a+', 'utf-8') as out_file:
             for line in json_lines:
                 out_file.write(line + '\n')
-
-    ds2_model.logger.info("finish inference")
-    return result_transcripts.pop()
+    with codecs.open('TRANSCRIPTION.json', 'a+', 'utf-8') as out_file:
+            out_file.write("Average Error Rate is : " + str(np.average(wer_arr)) +'\n')
+    ds2_model.logger.info("Finished Inference.")
+    if args.audio_path:
+        return result_transcripts.pop()
 
 def main():
     global ds2_model
@@ -200,21 +204,19 @@ def main():
     #args.audio_path = audio_path
     
     if not ds2_model:
-        print("Model loading initiated ...")        
+        print("\nModel Loading Initiated ...")        
         ds2_model, data_generator, vocab_list = load_model()  
-        print("Model loaded Successfully ...")        
+        print("\nModel Loaded Successfully ...\n")        
         tic = time.time()
         result_transcripts = infer(ds2_model, data_generator, vocab_list)
         toc = time.time()
-        print("{} sec required for audio file trnascription".format(toc-tic))
-        print("result transcripts: ", result_transcripts)
+        print("{} Mins Required For Transcription".format(toc-tic)/60)
     else:
         tic = time.time()
         result_transcripts = infer(ds2_model, data_generator, vocab_list)
         toc = time.time()
-        print("{} sec required for audio file trnascription".format(toc-tic))
-        print("result transcripts: ", result_transcripts)
+        print("{} Mins Required For Transcription".format(toc-tic))
     return result_transcripts
 
 if __name__ == '__main__':
-    main()
+    print(main())
