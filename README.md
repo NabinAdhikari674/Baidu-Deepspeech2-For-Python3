@@ -1,3 +1,34 @@
+# Custom Fork of Baidu Deepsheech2 for Python3
+    This is a custom fork for Baidu DP2 by NabinAhikari674.
+##### Environment to Run : Linux with Python3
+
+- Make sure these libraries or tools installed: `pkg-config`, `flac`, `ogg`, `vorbis`, `boost` and `swig`, e.g. installing them via `apt-get`:
+
+```bash
+sudo apt-get install -y pkg-config libflac-dev libogg-dev libvorbis-dev libboost-dev swig python-dev
+```
+- Install dependencies for python :
+
+```bash
+!pip install paddlepaddle-gpu kenlm
+#!pip install paddlepaddle # for CPU only Inference
+```
+- Run the setup script for the remaining dependencies and Setup : 
+
+```bash
+cd BaiduDeepspeech
+sh setup.sh
+```
+- Run the `prepare.sh` script for getting Data[Librispeech] and Pre-Trained Models [Baidu_en8k, Librispeech and English Language Model]  : 
+
+```bash
+sh prepare.sh
+```
+- To run Inference, use`inferBaidu.py`  [You can change process and model settings inside `inferBaidu.py`]: 
+```bash
+python inferBaidu.py
+```
+
 # DeepSpeech2 on PaddlePaddle
 
 [中文版](README_cn.md)
