@@ -40,11 +40,11 @@ add_arg('beta',             float,  0.3,    "Coef of WC for beam search.")
 add_arg('cutoff_prob',      float,  1.0,    "Cutoff probability for pruning.")
 add_arg('cutoff_top_n',     int,    40,     "Cutoff number for pruning.")
 add_arg('use_gru',          bool,   True,  "Use GRUs instead of simple RNNs.")
-add_arg('use_gpu',          bool,   False,   "Use GPU or not.")
+add_arg('use_gpu',          bool,   True,   "Use GPU or not.")
 add_arg('share_rnn_weights',bool,   False,   "Share input-hidden weights across "
                                             "bi-directional RNNs. Not for GRU.")
 add_arg('target_dir',   str,
-        '/content/DeepSpeech2/DeepSpeech/dataset/librispeech/test-clean/LibriSpeech/test-clean/',
+        '/content/Baidu-Deepspeech2-For-Python3/dataset/librispeech/test-clean/LibriSpeech/test-clean/',
         "Filepath of voice sample testing folder.")
 add_arg('infer_manifest',   str,
         'data/manifest.test-clean',
@@ -155,7 +155,7 @@ def infer(ds2_model, data_generator, vocab_list):
     #infer_data = next(batch_reader()) # (padded_audios, texts, audio_lens, masks, audio_file_path)
     error_rate_func = cer if args.error_rate_type == 'cer' else wer
     errors_sum, len_refs, num_ins = 0.0, 0, 0
-    error_arr = []
+    error_arr = [];wer_arr=[]
     ds2_model.logger.info("\nEverything Prepared .. Starting inference ...\n")
     for infer_data in batch_reader():
         probs_split= ds2_model.infer_batch_probs(
@@ -210,12 +210,12 @@ def main():
         tic = time.time()
         result_transcripts = infer(ds2_model, data_generator, vocab_list)
         toc = time.time()
-        print("{} Mins Required For Transcription".format(toc-tic)/60)
+        print("{} Mins Required For Transcription".format(toc-tic/60))
     else:
         tic = time.time()
         result_transcripts = infer(ds2_model, data_generator, vocab_list)
         toc = time.time()
-        print("{} Mins Required For Transcription".format(toc-tic))
+        print("{} Mins Required For Transcription".format(toc-tic/60))
     return result_transcripts
 
 if __name__ == '__main__':

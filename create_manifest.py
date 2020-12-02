@@ -39,7 +39,7 @@ def create_manifest(data_dir, manifest_path):
             for line in io.open(text_filepath, encoding="utf8"):
                 segments = line.strip().split()
                 text = ' '.join(segments[1:]).lower()
-                audio_filepath = os.path.join(subfolder, segments[0] + '.wav')
+                audio_filepath = os.path.join(subfolder, segments[0] + '.flac')
                 audio_data, samplerate = soundfile.read(audio_filepath)
                 duration = float(len(audio_data)) / samplerate
                 json_lines.append(
@@ -64,7 +64,3 @@ if __name__ == '__main__':
         target_dir = sys.argv[1]
         manifest_path = sys.argv[2]
         prepare_dataset(target_dir, manifest_path)
-    
-    
-    
-    
