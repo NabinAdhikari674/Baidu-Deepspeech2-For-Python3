@@ -26,14 +26,6 @@ if [ $? != 0 ]; then
     rm libsndfile-1.0.28.tar.gz
 fi
 
-# install decoders
-python -c "import pkg_resources; pkg_resources.require(\"swig_decoders==1.1\")"
-if [ $? != 0 ]; then
-    cd decoders/swig > /dev/null
-    sh setup.sh
-    cd - > /dev/null
-fi
-
 
 echo "Installed All Dependencies Successfully."
 
